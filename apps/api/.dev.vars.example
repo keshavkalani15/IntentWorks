@@ -1,0 +1,30 @@
+# Copy to .dev.vars (git-ignored) and fill in. `wrangler dev` loads it automatically.
+
+# Any random string >= 32 chars. Generate one with:
+#   node -e "console.log(crypto.randomBytes(32).toString('base64url'))"
+BETTER_AUTH_SECRET="replace-me-with-32-plus-random-characters"
+
+# Where the Worker itself is reachable. Cookies ignore port, so a cookie set here is sent
+# back through the Vite proxy on :5173.
+BETTER_AUTH_URL="http://localhost:8787"
+
+# Where the browser loads the SPA from. Used for CORS and trusted origins.
+WEB_ORIGIN="http://localhost:5173"
+
+# Required for the chat. Get one at https://openrouter.ai/keys
+OPENROUTER_API_KEY=""
+
+# Optional. Any tool-calling, vision-capable model id from https://openrouter.ai/models
+OPENROUTER_MODEL="meta/muse-spark-1.2"
+
+# Optional. Speech-to-text model for the microphone button.
+OPENROUTER_TRANSCRIBE_MODEL="openai/gpt-transcribe"
+
+# Optional. Embedding model for semantic search. Must return the dimension the
+# Vectorize index was created with (1536) — see src/memory/vector.ts.
+OPENROUTER_EMBEDDING_MODEL="google/gemini-embedding-2"
+
+# HMAC key for the MCP consent round-trip's `requestState`. Any random string >= 32 chars:
+#   node -e "console.log(crypto.randomBytes(32).toString('base64url'))"
+# Rotating this only invalidates consent prompts that are open at that moment.
+MCP_REQUEST_STATE_SECRET="replace-me-with-32-plus-random-characters"

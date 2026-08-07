@@ -1,0 +1,38 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler d1 migrations apply memory --local && wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "db:migrate:remote": "wrangler d1 migrations apply memory --remote",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply memory --local",
+    "test:mcp": "node scripts/mcp-e2e.mjs",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@better-auth/oauth-provider": "^1.6.26",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "@workspace/shared": "workspace:*",
+    "better-auth": "^1.6.26",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.13.0",
+    "jose": "^6.2.8",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260804.1",
+    "@eslint/js": "^10",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^10",
+    "globals": "^17",
+    "typescript": "~6",
+    "typescript-eslint": "^8",
+    "wrangler": "^4.119.0"
+  }
+}

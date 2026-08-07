@@ -1,0 +1,76 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "negotiated-memory",
+  "main": "./src/index.ts",
+  "compatibility_date": "2026-08-06",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Logs and traces both persisted to the dashboard. Traces matter more than usual here:
+  // a turn fans out to OpenRouter twice (chat + embeddings) plus Vectorize, and a trace is
+  // the only thing that says which of them is slow without adding timing code by hand.
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "persist": true, "invocation_logs": true },
+    "traces": { "enabled": true, "persist": true }
+  },
+
+  // DO NOT ENABLE. This caches responses from the fetch handler, and an HTTP cache keys on
+  // URL, not on who asked. `/api/graph` is the same URL for every user — the only thing
+  // separating them is a Cookie header — so a cached response can be served to a different
+  // account entirely. Turning this on produced exactly that.
+  //
+  // The SPA's assets are already cached by the asset store, which is a separate mechanism
+  // and unaffected, so this setting bought nothing here.
+  "cache": { "enabled": false },
+
+  // The SPA is served by this same Worker, so the app and its API share one origin.
+  // That is what makes the session cookie work with no CORS and no second deployment.
+  //
+  // `run_worker_first` sends only these prefixes through the Worker; everything else is
+  // served straight from the asset store without invoking it. Unknown paths fall back to
+  // index.html so client-side routes like /app/home survive a hard refresh.
+  //
+  // EVERY server-owned prefix MUST be listed here. That SPA fallback is why: a path missing
+  // from this list is not a 404, it is index.html with a 200. An MCP client fetching
+  // /.well-known/oauth-protected-resource/mcp would get a web page where it expected JSON
+  // and fail deep inside its own parser, with nothing in our logs — the Worker was never
+  // invoked at all.
+  "assets": {
+    "directory": "../web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/mcp", "/.well-known/*", "/consent/*", "/oauth/*"]
+  },
+
+  // Bind the Worker to the custom domain. `custom_domain` makes Cloudflare create and manage
+  // the DNS record and route the apex path, rather than needing a separate route pattern.
+  "routes": [{ "pattern": "memory.byvent.com", "custom_domain": true }],
+
+  // Non-secret production values. `.dev.vars` overrides these locally, so development keeps
+  // pointing at localhost while deploys use these.
+  //
+  // Pinned to the custom domain now that one exists. Leaving them empty makes the app infer
+  // its origin per request, which works but means a request arriving on the old
+  // *.workers.dev hostname would mint cookies for that hostname instead.
+  "vars": {
+    "BETTER_AUTH_URL": "https://memory.byvent.com",
+    "WEB_ORIGIN": "https://memory.byvent.com"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "memory",
+      "database_id": "1ba7cb11-c910-43ba-b985-0e07b12d4380",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Vectorize has no local emulator, so `remote: true` sends it to your account and
+  // `wrangler dev` requires you to be logged in. Everything else still runs locally.
+  //
+  // Embeddings are NOT a binding — they come from OpenRouter over plain fetch, so there is
+  // no second provider to configure and no behaviour difference between dev and production.
+  //
+  // Comment this out to fall back to keyword-only retrieval — see src/memory/vector.ts.
+  "vectorize": [{ "binding": "VECTORIZE", "index_name": "memories-v2", "remote": true }]
+}
