@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "node node_modules/turbo/bin/turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
     "format": "turbo format",
@@ -13,6 +13,7 @@
     "setup:cf": "bun run scripts/setup-cloudflare.ts"
   },
   "devDependencies": {
+    "@cloudflare/workerd-windows-64": "^1.20260804.1",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.9.18",

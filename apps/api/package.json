@@ -26,6 +26,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/workerd-windows-64": "^1.20260804.1",
     "@cloudflare/workers-types": "^5.20260804.1",
     "@eslint/js": "^10",
     "drizzle-kit": "^0.31.10",
