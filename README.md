@@ -8,6 +8,8 @@ It allows users to chat with an AI assistant while maintaining complete control 
 
 ## Demo
 
+[Website Link](https://memory.byvent.com/)
+
 [Watch the MemBot Demo Video](https://tinyurl.com/membotDemoLink)
 
 ## Key Features
